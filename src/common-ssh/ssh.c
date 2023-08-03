@@ -358,7 +358,9 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL PERFORM");
 
 		if (res != CURLE_OK) {
-			fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+			char buffer[200];
+			sprintf(buffer, "ERROR: curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+			guac_client_log(common_session->client, GUAC_LOG_DEBUG, buffer);
 		}
 
 		curl_easy_cleanup(curl);
