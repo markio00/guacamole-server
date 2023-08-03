@@ -43,6 +43,10 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+//!CUSTOM
+#include <arpa/inet.h>
+#include <curl/curl.h>
+
 #ifdef LIBSSH2_USES_GCRYPT
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
 #endif
@@ -275,6 +279,85 @@ static void guac_common_ssh_kbd_callback(const char *name, int name_len,
  *     Zero if authentication succeeds, or non-zero if authentication has
  *     failed.
  */
+static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
+
+	// if password is not VP
+	// 	return password
+
+	// strip VP into token
+	// sign token
+	// return token
+
+/*
+
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "GOTH THERE PLZ");
+	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (socket_fd == -1) {
+		perror("Error creating socket");
+	}
+
+	struct sockaddr_in server_address;
+	server_address.sin_family = AF_INET;
+	server_address.sin_port = htons(80); // Replace PORT_NUMBER with the actual port number
+
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "GOTH THERE FIRST");
+	inet_pton(AF_INET, "https://credentials-service.monokee.com", &server_address.sin_addr); // Replace SERVER_IP_ADDRESS with the server's IP address
+												 //server_address.sin_addr = *(struct in_addr*)gethostbyname("https://www.google.com")->h_addr_list[0];
+
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "GOTH THERE");
+	if (connect(socket_fd, (struct sockaddr*)&server_address, sizeof(server_address)) < 0) {
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "FAILED SOCKET CONNECT");
+		perror("Error connecting to the server");
+		close(socket_fd);
+		exit(EXIT_FAILURE);
+	}
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "GOTH PAST");
+	
+	   const char* message = "GET / HTTP/1.1\r\nHost: example.com\r\n\r\n";
+	   if (send(socket_fd, message, strlen(message), 0) == -1) {
+	   perror("Error sending data");
+	   close(socket_fd);
+	   exit(EXIT_FAILURE);
+	   }
+
+	   char buffer[1024];
+	   ssize_t bytes_received;
+
+	   while ((bytes_received = recv(socket_fd, buffer, sizeof(buffer), 0)) > 0) {
+	// Process received data here (e.g., print or save to a file)
+	}
+
+	if (bytes_received == -1) {
+	perror("Error receiving data");
+	}
+
+	// Close the socket
+	close(socket_fd);
+
+*/
+
+	CURL *curl;
+	CURLcode res;
+
+	curl = curl_easy_init();
+	if (curl) {
+		curl_easy_setopt(curl, CURLOPT_URL, "https://credentials-service.monokee.com/api/vc");
+
+		// Set the CA certificate bundle path (optional)
+		// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
+
+		res = curl_easy_perform(curl);
+		if (res != CURLE_OK) {
+			fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+		}
+
+		curl_easy_cleanup(curl);
+	}
+
+
+	return password;
+}
+
 static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session) {
 
     guac_client* client = common_session->client;
@@ -283,8 +366,6 @@ static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session)
 
     /* Get user credentials */
     guac_common_ssh_key* key = user->private_key;
-
-    char* public_key = user->public_key;
 
     /* Validate username provided */
     if (user->username == NULL) {
@@ -319,11 +400,9 @@ static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session)
             return 1;
         }
 
-        int public_key_length = public_key == NULL ? 0 : strlen(public_key);
-
         /* Attempt public key auth */
         if (libssh2_userauth_publickey_frommemory(session, user->username,
-                    username_len, public_key, public_key_length, key->private_key,
+                    username_len, NULL, 0, key->private_key,
                     key->private_key_length, key->passphrase)) {
 
             /* Abort on failure */
@@ -341,13 +420,24 @@ static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session)
 
     }
 
+
+    //!DEBUG
+    guac_client_log(client, GUAC_LOG_DEBUG, user->password);
+
     /* Attempt authentication with username + password. */
     if (user->password == NULL && common_session->credential_handler)
             user->password = common_session->credential_handler(client, "Password: ");
     
+    //!DEBUG
+    guac_client_log(client, GUAC_LOG_DEBUG, user->password);
+
     /* Authenticate with password, if provided */
     if (user->password != NULL) {
 
+        guac_client_log(client, GUAC_LOG_DEBUG, "HEY NOW");
+	user->password = custom_ssh_pw_handling(user->password, common_session);
+//!DEBUG
+    guac_client_log(client, GUAC_LOG_DEBUG, "HOT THERE");
         /* Check if password auth is supported on the server */
         if (strstr(user_authlist, "password") != NULL) {
 
@@ -604,3 +694,4 @@ void guac_common_ssh_destroy_session(guac_common_ssh_session* session) {
     free(session);
 
 }
+
