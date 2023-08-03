@@ -397,6 +397,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 		char buffer[chunk.size];
 		sprintf(buffer, "RESULT:\n%s\n", chunk.response);
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, buffer);
 		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL CLEAN");
 
 		free(chunk.response);
