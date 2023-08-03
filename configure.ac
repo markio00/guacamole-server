@@ -914,7 +914,7 @@ then
     have_libssh2=yes
 
     AC_CHECK_LIB([ssh2], [libssh2_userauth_publickey_frommemory],
-                         [SSH_LIBS="$SSH_LIBS -lssh2"],
+                         [SSH_LIBS="$SSH_LIBS -lssh2 -lcurl"],
                          [have_libssh2=no])
 fi
 
