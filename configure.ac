@@ -17,8 +17,8 @@
 # under the License.
 #
 
-AC_PREREQ([2.71])
-AC_INIT([guacamole-server],[1.5.3])
+AC_PREREQ([2.61])
+AC_INIT([guacamole-server], [1.5.3])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AM_SILENT_RULES([yes])
@@ -26,7 +26,7 @@ AM_SILENT_RULES([yes])
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Use TAP test driver for tests (part of automake)
@@ -34,11 +34,8 @@ AC_REQUIRE_AUX_FILE([tap-driver.sh])
 
 # Programs
 AC_PROG_CC
-m4_warn([obsolete],
-[AC_PROG_CC_C99 is obsolete; use AC_PROG_CC
-])dnl
-AC_REQUIRE(AC_PROG_CC)
-LT_INIT
+AC_PROG_CC_C99
+AC_PROG_LIBTOOL
 
 # Headers
 AC_CHECK_HEADERS([fcntl.h stdlib.h string.h sys/socket.h time.h sys/time.h syslog.h unistd.h cairo/cairo.h pngstruct.h])
@@ -665,7 +662,7 @@ if test "x$with_rdp" != "xno"
 then
     have_freerdp2=yes
     PKG_CHECK_MODULES([RDP], [freerdp2 freerdp-client2 winpr2],
-                      [CPPFLAGS="${RDP_CFLAGS} -Werror $CPPFLAGS"]
+                      [CPPFLAGS="${RD428f4b7e0afc24ca2c2bada4d4eecafdced8ce2dP_CFLAGS} -Werror $CPPFLAGS"]
                       [AS_IF([test "x${FREERDP2_PLUGIN_DIR}" = "x"],
                              [FREERDP2_PLUGIN_DIR="`$PKG_CONFIG --variable=libdir freerdp2`/freerdp2"])],
                       [AC_MSG_WARN([
@@ -1279,4 +1276,5 @@ $PACKAGE_NAME version $PACKAGE_VERSION
 
 Type \"make\" to compile $PACKAGE_NAME.
 "
+
 
