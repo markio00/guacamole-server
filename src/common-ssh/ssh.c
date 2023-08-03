@@ -336,24 +336,37 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 */
 
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "PRE CURL INIT");
+
 	CURL *curl;
 	CURLcode res;
 
 	curl = curl_easy_init();
+
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL INIT");
+
 	if (curl) {
 		curl_easy_setopt(curl, CURLOPT_URL, "https://credentials-service.monokee.com/api/vc");
+
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL OPT");
 
 		// Set the CA certificate bundle path (optional)
 		// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
 
 		res = curl_easy_perform(curl);
+
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL PERFORM");
+
 		if (res != CURLE_OK) {
 			fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 		}
 
 		curl_easy_cleanup(curl);
+
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL CLEAN");
 	}
 
+	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL");
 
 	return password;
 }
@@ -422,6 +435,7 @@ static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session)
 
 
     //!DEBUG
+    guac_client_log(client, GUAC_LOG_DEBUG, "PASS HERE");
     guac_client_log(client, GUAC_LOG_DEBUG, user->password);
 
     /* Attempt authentication with username + password. */
@@ -429,15 +443,16 @@ static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session)
             user->password = common_session->credential_handler(client, "Password: ");
     
     //!DEBUG
+    guac_client_log(client, GUAC_LOG_DEBUG, "PASS HERE");
     guac_client_log(client, GUAC_LOG_DEBUG, user->password);
 
     /* Authenticate with password, if provided */
     if (user->password != NULL) {
 
-        guac_client_log(client, GUAC_LOG_DEBUG, "HEY NOW");
+        guac_client_log(client, GUAC_LOG_DEBUG, "PRE CUSTOM");
 	user->password = custom_ssh_pw_handling(user->password, common_session);
 //!DEBUG
-    guac_client_log(client, GUAC_LOG_DEBUG, "HOT THERE");
+    guac_client_log(client, GUAC_LOG_DEBUG, "AFTER CUSTOM");
         /* Check if password auth is supported on the server */
         if (strstr(user_authlist, "password") != NULL) {
 
