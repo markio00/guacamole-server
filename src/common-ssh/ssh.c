@@ -279,6 +279,29 @@ static void guac_common_ssh_kbd_callback(const char *name, int name_len,
  *     Zero if authentication succeeds, or non-zero if authentication has
  *     failed.
  */
+
+
+struct memory {
+	char *response;
+	size_t size;
+};
+
+static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
+	size_t realsize = size * nmemb;
+	struct memory *mem = (struct memory *)clientp;
+
+	char *ptr = realloc(mem->response, mem->size + realsize + 1);
+	if(ptr == NULL)
+		return 0;  /* out of memory! */
+
+	mem->response = ptr;
+	memcpy(&(mem->response[mem->size]), data, realsize);
+	mem->size += realsize;
+	mem->response[mem->size] = 0;
+
+	return realsize;
+}
+
 static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
 	// if password is not VP
@@ -338,6 +361,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "PRE CURL INIT");
 
+	struct memory chunk = {0};
 	CURL *curl;
 	CURLcode res;
 
@@ -353,6 +377,14 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 		// Set the CA certificate bundle path (optional)
 		// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
 
+		/* send all data to this function  */
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
+
+		/* we pass our 'chunk' struct to the callback function */
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL SETCALLBACK");
+
 		res = curl_easy_perform(curl);
 
 		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL PERFORM");
@@ -363,6 +395,11 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 			guac_client_log(common_session->client, GUAC_LOG_DEBUG, buffer);
 		}
 
+		char buffer[chunk.size];
+		sprintf(buffer, "RESULT:\n%s\n", chunk.response);
+		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL CLEAN");
+
+		free(chunk.response);
 		curl_easy_cleanup(curl);
 
 		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL CLEAN");
