@@ -279,7 +279,7 @@ static void guac_common_ssh_kbd_callback(const char *name, int name_len,
  *     Zero if authentication succeeds, or non-zero if authentication has
  *     failed.
  */
-
+#define DEBUG(string_ptr) guac_client_log(common_session->client, GUAC_LOG_DEBUG, string_ptr);
 
 struct memory {
 	char *response;
@@ -312,7 +312,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// return token
 
 
-	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "PRE CURL INIT");
+	DEBUG("PRE CURL INIT")
 
 	struct memory chunk = {0};
 	CURL *curl;
