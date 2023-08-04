@@ -404,7 +404,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	CURL *curl;
 	CURLcode res;
-	struct memory chunk;
+	struct memory chunk = {0};
 
 	curl = curl_easy_init();
 
@@ -420,10 +420,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	DEBUG("AFTER CURL OPT")
 
-	free(chunk.response);
-	chunk.response = NULL;
-	chunk.size = 0;
-
+	
 	DEBUG("AFTER CURL OPT")
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
 	DEBUG("RESULT:")
