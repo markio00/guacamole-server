@@ -313,7 +313,7 @@ static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
 	return realsize;
 }
 
-int do_GET(CURL *handle, char *url, struct memory *chunk, guac_common_ssh_session *common_session) {
+static int do_GET(CURL *handle, char *url, struct memory *chunk, guac_common_ssh_session *common_session) {
 
 	CURLcode retcode;
 	struct curl_slist *list = NULL;
@@ -351,7 +351,7 @@ int do_GET(CURL *handle, char *url, struct memory *chunk, guac_common_ssh_sessio
 	return retcode;
 }
 
-int do_POST(CURL *handle, char *url, struct memory *chunk, const char *payload, guac_common_ssh_session *common_session) {
+static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *payload, guac_common_ssh_session *common_session) {
 
 	CURLcode retcode;
 	struct curl_slist *list = NULL;
@@ -435,7 +435,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	
 	DEBUG(chunk.response);
-/*
+
 	DEBUG("AFTER CURL OPT")
 
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
@@ -481,7 +481,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG("AFTER CURL CLEAN")
 
 	DEBUG("AFTER CURL")
-*/
+
 	return password;
 }
 
