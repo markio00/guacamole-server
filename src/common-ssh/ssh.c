@@ -419,12 +419,11 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
 
 	res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-	fprintf(stderr, "URL\n");
 
 	DEBUG("AFTER CURL OPT")
 
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
-	DEBUG("RESULT:\n")
+	DEBUG("RESULT:")
 	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
 		DEBUG("ERR GET 1");
