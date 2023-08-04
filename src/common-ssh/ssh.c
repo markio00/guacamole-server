@@ -281,6 +281,17 @@ static void guac_common_ssh_kbd_callback(const char *name, int name_len,
  */
 #define DEBUG(string_ptr) guac_client_log(common_session->client, GUAC_LOG_DEBUG, string_ptr);
 
+#define CURL_ERR_HANDLE(retcode) {\
+	if (retcode != CURLE_OK) {\
+\
+		chunk->size = 50;\
+		chunk->response = malloc(chunk->size);\
+		sprintf(chunk->response, "Error: %s\n", curl_easy_strerror(retcode));\
+\
+		return retcode;\
+	}\
+}
+
 struct memory {
 	char *response;
 	size_t size;
@@ -302,6 +313,84 @@ static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
 	return realsize;
 }
 
+int do_GET(CURL *handle, char *url, struct memory *chunk, guac_common_ssh_session *common_session) {
+
+	CURLcode retcode;
+	struct curl_slist *list = NULL;
+
+	// send all data to this function 
+	retcode = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, cb);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("WRITEFUN");
+
+	// we pass our 'chunk' struct to the callback function
+	retcode = curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void *)chunk);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("WRITEDATA");
+
+	// we setup the URL for the reqeust
+	retcode = curl_easy_setopt(handle, CURLOPT_URL, url);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("URL");
+
+	// we set the post reqeust flag
+	retcode = curl_easy_setopt(handle, CURLOPT_HTTPGET, 1L);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("GET");
+	
+	// we set appropriate headers
+	curl_easy_setopt(handle, CURLOPT_HTTPHEADER, list);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("HEADER");
+
+	// send a request
+	retcode = curl_easy_perform(handle);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("PERFORM");
+
+	return retcode;
+}
+
+int do_POST(CURL *handle, char *url, struct memory *chunk, const char *payload, guac_common_ssh_session *common_session) {
+
+	CURLcode retcode;
+	struct curl_slist *list = NULL;
+
+
+	// send all data to this function 
+	retcode = curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, cb);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("WRITEFUN");
+
+	// we pass our 'chunk' struct to the callback function
+	retcode = curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void *)chunk);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("WRITEDATA");
+
+	// we setup the URL for the reqeust
+	retcode = curl_easy_setopt(handle, CURLOPT_URL, url);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("URL");
+
+	// we set the post reqeust flag
+	retcode = curl_easy_setopt(handle, CURLOPT_POSTFIELDS, "f1=2");
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("POST");
+
+	// wee set appropriate headers
+	list = curl_slist_append(list, "Content-Type: application/json");
+	curl_easy_setopt(handle, CURLOPT_HTTPHEADER, list);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("HEADER");
+
+	// send a request
+	retcode = curl_easy_perform(handle);
+	CURL_ERR_HANDLE(retcode);
+		DEBUG("PERFORM");
+
+	return retcode;
+}
+
 static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
 	// if password is not VP
@@ -311,55 +400,75 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// sign token
 	// return token
 
-
 	DEBUG("PRE CURL INIT")
 
-	struct memory chunk = {0};
 	CURL *curl;
 	CURLcode res;
+	struct memory chunk;
 
 	curl = curl_easy_init();
 
-	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL INIT");
+	DEBUG("AFTER CURL INIT")
 
-	if (curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, "https://credentials-service.monokee.com/api/vc");
-
-		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL OPT");
-
-		// Set the CA certificate bundle path (optional)
-		// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
-
-		/* send all data to this function  */
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
-
-		/* we pass our 'chunk' struct to the callback function */
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-
-		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL SETCALLBACK");
-
-		res = curl_easy_perform(curl);
-
-		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL PERFORM");
-
-		if (res != CURLE_OK) {
-			char buffer[200];
-			sprintf(buffer, "ERROR: curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-			guac_client_log(common_session->client, GUAC_LOG_DEBUG, buffer);
-		}
-
-		char buffer[chunk.size];
-		sprintf(buffer, "RESULT:\n%s\n", chunk.response);
-		guac_client_log(common_session->client, GUAC_LOG_DEBUG, buffer);
-		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL CLEAN");
-
-		free(chunk.response);
-		curl_easy_cleanup(curl);
-
-		guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL CLEAN");
+	if (! curl) {
+		DEBUG("Error on curl init, couldn't proceed");
+		return password;
 	}
 
-	guac_client_log(common_session->client, GUAC_LOG_DEBUG, "AFTER CURL");
+	// Set the CA certificate bundle path (optional)
+	// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
+
+	res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	fprintf(stderr, "URL\n");
+
+	DEBUG("AFTER CURL OPT")
+
+	free(chunk.response);
+	chunk.response = NULL;
+	chunk.size = 0;
+
+	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
+	fprintf(stdout, "%s\n", chunk.response);
+	if (res != CURLE_OK) {
+		DEBUG("ERR GET 1");
+		return password;
+	}
+
+	DEBUG("AFTER GET 1")
+
+	free(chunk.response);
+	chunk.response = NULL;
+	chunk.size = 0;
+
+	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/issueVC", &chunk, "{hey: 2}", common_session);
+	fprintf(stdout, "%s\n", chunk.response);
+	if (res != CURLE_OK) {
+		DEBUG("ERR POST 1");
+		return password;
+	}
+
+	DEBUG("AFTER POST 1")
+
+	free(chunk.response);
+	chunk.response = NULL;
+	chunk.size = 0;
+
+	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
+	fprintf(stdout, "%s\n", chunk.response);
+	if (res != CURLE_OK) {
+		DEBUG("ERR GET 2");
+		return password;
+	}
+
+	DEBUG("AFTER GET 2")
+
+
+	free(chunk.response);
+	curl_easy_cleanup(curl);
+
+	DEBUG("AFTER CURL CLEAN")
+
+	DEBUG("AFTER CURL")
 
 	return password;
 }
@@ -702,4 +811,5 @@ void guac_common_ssh_destroy_session(guac_common_ssh_session* session) {
     free(session);
 
 }
+
 
