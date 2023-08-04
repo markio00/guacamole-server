@@ -424,6 +424,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	chunk.response = NULL;
 	chunk.size = 0;
 
+	DEBUG("AFTER CURL OPT")
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
