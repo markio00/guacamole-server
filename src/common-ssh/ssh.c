@@ -404,7 +404,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	CURL *curl;
 	CURLcode res;
-	struct memory chunk;
+	struct memory chunk = {0};
 
 	curl = curl_easy_init();
 
@@ -419,7 +419,17 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
 
 	res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	
+	res = curl_easy_setopt(curl, CURLOPT_URL, "https://credentials-service.monokee.com/api/vc");
 
+	res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+	res = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
+
+	res = curl_easy_perform(curl);
+
+	DEBUG(chunk.response);
+/*
 	DEBUG("AFTER CURL OPT")
 
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
@@ -465,7 +475,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG("AFTER CURL CLEAN")
 
 	DEBUG("AFTER CURL")
-
+*/
 	return password;
 }
 
