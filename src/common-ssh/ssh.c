@@ -345,7 +345,7 @@ int do_GET(CURL *handle, char *url, struct memory *chunk, guac_common_ssh_sessio
 
 	// send a request
 	retcode = curl_easy_perform(handle);
-	CURL_ERR_HANDLE(retcode);
+	//CURL_ERR_HANDLE(retcode);
 		DEBUG("PERFORM");
 
 	return retcode;
