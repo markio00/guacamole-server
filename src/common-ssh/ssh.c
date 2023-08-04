@@ -423,12 +423,9 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	DEBUG("AFTER CURL OPT")
 
-	free(chunk.response);
-	chunk.response = NULL;
-	chunk.size = 0;
-
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
-	fprintf(stdout, "%s\n", chunk.response);
+	DEBUG("RESULT:\n")
+	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
 		DEBUG("ERR GET 1");
 		return password;
