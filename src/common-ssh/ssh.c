@@ -404,7 +404,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	CURL *curl;
 	CURLcode res;
-	struct memory chunk = {0};
+	struct memory chunk;
 
 	curl = curl_easy_init();
 
@@ -418,25 +418,11 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// Set the CA certificate bundle path (optional)
 	// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
 
-	res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-	DEBUG(curl_easy_strerror(res));
-	
-	res = curl_easy_setopt(curl, CURLOPT_URL, "https://credentials-service.monokee.com/api/vc");
-	DEBUG(curl_easy_strerror(res));
-
-	res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-	DEBUG(curl_easy_strerror(res));
-
-	res = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, cb);
-	DEBUG(curl_easy_strerror(res));
-
-	res = curl_easy_perform(curl);
-	DEBUG(curl_easy_strerror(res));
-
-	
-	DEBUG(chunk.response);
-
 	DEBUG("AFTER CURL OPT")
+
+	free(chunk.response);
+	chunk.response = NULL;
+	chunk.size = 0;
 
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
 	DEBUG("RESULT:")
@@ -453,7 +439,8 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	chunk.size = 0;
 
 	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/issueVC", &chunk, "{hey: 2}", common_session);
-	fprintf(stdout, "%s\n", chunk.response);
+	DEBUG("RESULT:")
+	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
 		DEBUG("ERR POST 1");
 		return password;
@@ -466,7 +453,8 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	chunk.size = 0;
 
 	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
-	fprintf(stdout, "%s\n", chunk.response);
+	DEBUG("RESULT:")
+	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
 		DEBUG("ERR GET 2");
 		return password;
