@@ -47,7 +47,7 @@
 //!CUSTOM
 #include <arpa/inet.h>
 #include <curl/curl.h>
-#include <regex.h>:
+#include <regex.h>
 
 
 #ifdef LIBSSH2_USES_GCRYPT
