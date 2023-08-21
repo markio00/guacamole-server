@@ -407,7 +407,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	CURLcode res;
 	struct memory chunk = {0};
 
-	char* fmt = "{\"presentation\":\"%s\"}";
+	char* fmt = "{\"jwt\":\"%s\"}";
 	char* payload = malloc(strlen(password) + strlen(fmt)-2 + 1);
 	sprintf(payload, fmt, password);
 	DEBUG(payload)
@@ -442,7 +442,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	chunk.response = NULL;
 	chunk.size = 0;
 
-	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/issueVC", &chunk, payload, common_session);
+	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/verifyJWT", &chunk, payload, common_session);
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
