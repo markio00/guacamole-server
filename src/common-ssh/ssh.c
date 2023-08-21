@@ -48,6 +48,8 @@
 #include <arpa/inet.h>
 #include <curl/curl.h>
 #include <regex.h>
+#include <openssl/evp.h>
+#include <openssl/hmac.h>
 
 
 #ifdef LIBSSH2_USES_GCRYPT
@@ -524,6 +526,24 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	}
 
 	DEBUG("AFTER VER CP")
+
+	char *key = strdup("security is awesome");
+	int keylen = strlen(key);
+	const unsigned char *data = (const unsigned char *)strdup("leonardo2:x:1001:1002::/home/leonardo2:/bin/bash");
+	int datalen = strlen((char *)data);
+	unsigned char *result = NULL;
+	unsigned int resultlen = -1;
+
+	result = HMAC(EVP_sha256(),(const void *)key, keylen, data, datalen, result, &resultlen);
+
+	for (unsigned int i = 0; i < resultlen; i++) 
+		printf("%c", result[i]);
+
+	printf("\n");
+	for (unsigned int i = 0; i < resultlen; i++) 
+		printf("%02hhX ", result[i]);
+
+	printf("\nencrypted: %s   len = %d\n", result, resultlen);
 
 	free(chunk.response);
 	curl_easy_cleanup(curl);
