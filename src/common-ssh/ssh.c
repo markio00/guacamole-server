@@ -24,6 +24,7 @@
 #include <guacamole/client.h>
 #include <guacamole/fips.h>
 #include <libssh2.h>
+#include <stdio.h>
 
 #ifdef LIBSSH2_USES_GCRYPT
 #include <gcrypt.h>
@@ -405,7 +406,12 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	CURL *curl;
 	CURLcode res;
 	struct memory chunk = {0};
-
+	
+	char* fmt = "{\"presentation\":\"%s\"}";
+	char* payload = malloc(strlen(password) + strlen(fmt)-2 + 1);
+	sprintf(payload, fmt, password);
+	DEBUG(payload)
+/*
 	curl = curl_easy_init();
 
 	DEBUG("AFTER CURL INIT")
@@ -463,7 +469,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	free(chunk.response);
 	curl_easy_cleanup(curl);
-
+*/
 	DEBUG("AFTER CURL CLEAN")
 
 	DEBUG("AFTER CURL")
