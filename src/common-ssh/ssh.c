@@ -292,7 +292,7 @@ static void guac_common_ssh_kbd_callback(const char *name, int name_len,
 		return retcode;\
 	}\
 }
-
+/*
 struct memory {
 	char *response;
 	size_t size;
@@ -304,7 +304,7 @@ static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
 
 	char *ptr = realloc(mem->response, mem->size + realsize + 1);
 	if(ptr == NULL)
-		return 0;  /* out of memory! */
+		return 0;  // out of memory!
 
 	mem->response = ptr;
 	memcpy(&(mem->response[mem->size]), data, realsize);
@@ -391,7 +391,7 @@ static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *pa
 
 	return retcode;
 }
-
+*/
 static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
 	// if password is not VP
@@ -402,11 +402,11 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// return token
 
 	DEBUG("PRE CURL INIT")
-
+/*
 	CURL *curl;
 	CURLcode res;
 	struct memory chunk = {0};
-	
+*/
 	char* fmt = "{\"presentation\":\"%s\"}";
 	char* payload = malloc(strlen(password) + strlen(fmt)-2 + 1);
 	sprintf(payload, fmt, password);
