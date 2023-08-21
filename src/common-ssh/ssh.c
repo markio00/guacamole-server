@@ -420,7 +420,8 @@ void regex(char* regexp, regmatch_t* matches, int nmatches, char* input) {
 
 char* extractVC(char* input) {
 
-	char* regexp = "\\\"verifiableCredential\\\":\\[\\\"([a-zA-Z0-9_=]+\\.[a-zA-Z0-9_=]+\\.[a-zA-Z0-9_\\-\\+\\/=]*)\\\"\\]";
+	//char* regexp = "\\\"verifiableCredential\\\":\\[\\\"([a-zA-Z0-9_=]+\\.[a-zA-Z0-9_=]+\\.[a-zA-Z0-9_\\-\\+\\/=]*)\\\"\\]";
+	char* regexp = "\\\"verifiableCredential\\\":\\[\\\"([^}]*)\\\"\\]";
 	int nmatches = 2;
 	regmatch_t matches[nmatches];
 	
