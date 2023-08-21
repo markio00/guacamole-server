@@ -545,6 +545,10 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	printf("\nencrypted: %s   len = %d\n", result, resultlen);
 
+	char encodedData[100];
+	EVP_EncodeBlock((unsigned char *)encodedData, result, 16);
+	printf("%s\n",encodedData);
+
 	free(chunk.response);
 	curl_easy_cleanup(curl);
 
