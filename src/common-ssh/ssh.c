@@ -396,7 +396,7 @@ static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *pa
 void regex(char* regexp, regmatch_t* matches, int nmatches, char* input) {
 
 	regex_t regex;
-	int rc = regcomp(&regex, "\\\"verifiableCredential\\\":\\[\\\"(.*)\\\"\\]", REG_EXTENDED);
+	int rc = regcomp(&regex, "\\\"verifiableCredential\\\":\\[\\\"([^}]*)\\\"\\]", REG_EXTENDED);
 	if (rc != 0) {
 		fprintf(stderr, "Could not compile regex\n");
 		exit(1);
