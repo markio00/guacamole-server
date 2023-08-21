@@ -447,7 +447,9 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/verifyJWT", &chunk, payload, common_session);
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
-printf("%lu", strlen(chunk.response));
+	char* var = malloc(20);
+sprintf(var, "%lu", strlen(chunk.response));
+DEBUG(var)
 	if (res != CURLE_OK) {
 		DEBUG("ERR VER VP");
 		return password;
