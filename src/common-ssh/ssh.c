@@ -421,6 +421,8 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 		return password;
 	}
 
+	res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	
 	// Set the CA certificate bundle path (optional)
 	// curl_easy_setopt(curl, CURLOPT_CAINFO, "/path/to/cacert.pem");
 
