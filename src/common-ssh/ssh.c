@@ -292,7 +292,7 @@ static void guac_common_ssh_kbd_callback(const char *name, int name_len,
 		return retcode;\
 	}\
 }
-/*
+
 struct memory {
 	char *response;
 	size_t size;
@@ -391,7 +391,7 @@ static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *pa
 
 	return retcode;
 }
-*/
+
 static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
 	// if password is not VP
@@ -402,16 +402,16 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	// return token
 
 	DEBUG("PRE CURL INIT")
-/*
+
 	CURL *curl;
 	CURLcode res;
 	struct memory chunk = {0};
-*/
+
 	char* fmt = "{\"presentation\":\"%s\"}";
 	char* payload = malloc(strlen(password) + strlen(fmt)-2 + 1);
 	sprintf(payload, fmt, password);
 	DEBUG(payload)
-/*
+
 	curl = curl_easy_init();
 
 	DEBUG("AFTER CURL INIT")
@@ -432,26 +432,26 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
-		DEBUG("ERR GET 1");
+		DEBUG("ERR PING");
 		return password;
 	}
 
-	DEBUG("AFTER GET 1")
+	DEBUG("AFTER PING")
 
 	free(chunk.response);
 	chunk.response = NULL;
 	chunk.size = 0;
 
-	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/issueVC", &chunk, "{hey: 2}", common_session);
+	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/issueVC", &chunk, payload, common_session);
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
-		DEBUG("ERR POST 1");
+		DEBUG("ERR VER VP");
 		return password;
 	}
 
-	DEBUG("AFTER POST 1")
-
+	DEBUG("AFTER VER VP")
+/*
 	free(chunk.response);
 	chunk.response = NULL;
 	chunk.size = 0;
@@ -460,16 +460,16 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
-		DEBUG("ERR GET 2");
+		DEBUG("ERR VER VC");
 		return password;
 	}
 
-	DEBUG("AFTER GET 2")
+	DEBUG("AFTER VER VC")
 
-
+*/
 	free(chunk.response);
 	curl_easy_cleanup(curl);
-*/
+
 	DEBUG("AFTER CURL CLEAN")
 
 	DEBUG("AFTER CURL")
