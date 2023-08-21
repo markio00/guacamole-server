@@ -374,7 +374,7 @@ static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *pa
 		DEBUG("URL");
 
 	// we set the post reqeust flag
-	retcode = curl_easy_setopt(handle, CURLOPT_POSTFIELDS, "f1=2");
+	retcode = curl_easy_setopt(handle, CURLOPT_POSTFIELDS, payload);
 	CURL_ERR_HANDLE(retcode);
 		DEBUG("POST");
 
