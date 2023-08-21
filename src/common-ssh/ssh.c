@@ -501,7 +501,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	DEBUG("AFTER VER VP")
 	
-	char *vc = extractVC(chunk.payload);
+	char *vc = extractVC(chunk.response);
 	payload = malloc(strlen(vc) + strlen(fmt)-2 + 1);
 	sprintf(payload, fmt, vc);
 	DEBUG(payload)
