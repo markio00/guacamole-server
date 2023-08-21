@@ -47,6 +47,8 @@
 //!CUSTOM
 #include <arpa/inet.h>
 #include <curl/curl.h>
+#include <regex.h>:
+
 
 #ifdef LIBSSH2_USES_GCRYPT
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
@@ -298,7 +300,7 @@ struct memory {
 	size_t size;
 };
 
-static size_t cb(void *data, size_t size, size_t nmemb, void *clientp) {
+static size_t cb(void *data,regex_t regex; size_t size, size_t nmemb, void *clientp) {
 	size_t realsize = size * nmemb;
 	struct memory *mem = (struct memory *)clientp;
 
@@ -391,6 +393,48 @@ static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *pa
 
 	return retcode;
 }
+void regex(char* regexp, regmatch_t* matches, int nmatches, char* input) {
+
+	regex_t regex;
+	int rc = regcomp(&regex, "\\\"verifiableCredential\\\":\\[\\\"(.*)\\\"\\]", REG_EXTENDED);
+	if (rc != 0) {
+		fprintf(stderr, "Could not compile regex\n");
+		exit(1);
+	}
+
+	rc = regexec(&regex, input, nmatches, matches, 0);
+	if (rc == 0) {
+		printf("Match!\n");
+		return ;
+	}
+	else if (rc == REG_NOMATCH) {
+		printf("No match\n");
+		return ;
+	}
+	else {
+		perror("Error\n");
+		exit(1);
+	}
+}
+
+
+char* extractVC(char* input) {
+
+	char* regexp = "\\\"verifiableCredential\\\":\\[\\\"(.*)\\\"\\]";
+	int nmatches = 2;
+	regmatch_t matches[nmatches];
+	
+	regex(regexp, matches, nmatches, input);
+	if (matches[nmatches-1].rm_so != -1) {
+		int start = matches[nmatches-1].rm_so;
+		int end = matches[nmatches-1].rm_eo;
+		char *capturedText = malloc(end - start + 1);
+		strncpy(capturedText, input + start, end - start);
+		capturedText[end - start] = '\0';
+		return capturedText;
+	}        
+	return "";
+}
 
 static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
@@ -448,30 +492,38 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
 	char* var = malloc(20);
-sprintf(var, "%lu", strlen(chunk.response));
-DEBUG(var)
+	sprintf(var, "%lu", strlen(chunk.response));
+	DEBUG(var)
 	if (res != CURLE_OK) {
 		DEBUG("ERR VER VP");
 		return password;
 	}
 
 	DEBUG("AFTER VER VP")
-/*
+	
+	char *vc = extractVC(chunk.payload);
+	payload = malloc(strlen(vc) + strlen(fmt)-2 + 1);
+	sprintf(payload, fmt, vc);
+	DEBUG(payload)
+
+
 	free(chunk.response);
 	chunk.response = NULL;
 	chunk.size = 0;
 
-	res = do_GET(curl, "https://credentials-service.monokee.com/api/vc", &chunk, common_session);
+	res = do_POST(curl, "https://credentials-service.monokee.com/api/vc/verifyJWT", &chunk, payload, common_session);
 	DEBUG("RESULT:")
 	DEBUG( chunk.response);
+	var = malloc(20);
+	sprintf(var, "%lu", strlen(chunk.response));
+	DEBUG(var)
 	if (res != CURLE_OK) {
-		DEBUG("ERR VER VC");
+		DEBUG("ERR VER CP");
 		return password;
 	}
 
-	DEBUG("AFTER VER VC")
+	DEBUG("AFTER VER CP")
 
-*/
 	free(chunk.response);
 	curl_easy_cleanup(curl);
 
