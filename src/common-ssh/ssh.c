@@ -425,9 +425,9 @@ char* extractVC(char* input) {
 	regmatch_t matches[nmatches];
 	
 	regex(regexp, matches, nmatches, input);
-	if (matches[nmatches-1].rm_so != -1) {
-		int start = matches[nmatches-1].rm_so;
-		int end = matches[nmatches-1].rm_eo;
+	if (matches[nmatches].rm_so != -1) {
+		int start = matches[nmatches].rm_so;
+		int end = matches[nmatches].rm_eo;
 		char *capturedText = malloc(end - start + 1);
 		strncpy(capturedText, input + start, end - start);
 		capturedText[end - start] = '\0';
