@@ -439,16 +439,11 @@ char* extractVC(char* input) {
 	return "";
 }
 
-static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* common_session) { //!CUSTOM
+void ssh_pw_handling(char* username, char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
-	// if password is not VP
-	// 	return password
 
-	// strip VP into token
-	// sign token
-	// return token
-
-	DEBUG("PRE CURL INIT")
+	char* newusername;
+	char* newpassword;
 
 	CURL *curl;
 	CURLcode res;
@@ -465,7 +460,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	if (! curl) {
 		DEBUG("Error on curl init, couldn't proceed");
-		return password;
+		return;
 	}
 
 	res = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -482,7 +477,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG( chunk.response);
 	if (res != CURLE_OK) {
 		DEBUG("ERR PING");
-		return password;
+		return;
 	}
 
 	DEBUG("AFTER PING")
@@ -499,7 +494,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG(var)
 	if (res != CURLE_OK) {
 		DEBUG("ERR VER VP");
-		return password;
+		return;
 	}
 
 	DEBUG("AFTER VER VP")
@@ -522,7 +517,7 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 	DEBUG(var)
 	if (res != CURLE_OK) {
 		DEBUG("ERR VER CP");
-		return password;
+		return;
 	}
 
 	DEBUG("AFTER VER CP")
@@ -556,7 +551,8 @@ static char* custom_ssh_pw_handling(char* password, guac_common_ssh_session* com
 
 	DEBUG("AFTER CURL")
 
-	return password;
+	username = newusername;
+	password = newpassword;
 }
 
 static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session) {
@@ -638,7 +634,7 @@ static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session)
     if (user->password != NULL) {
 
         guac_client_log(client, GUAC_LOG_DEBUG, "PRE CUSTOM");
-	user->password = custom_ssh_pw_handling(user->password, common_session);
+	custom_ssh_pw_handling(user->username, user->password, common_session);
 //!DEBUG
     guac_client_log(client, GUAC_LOG_DEBUG, "AFTER CUSTOM");
         /* Check if password auth is supported on the server */
