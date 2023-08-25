@@ -572,8 +572,8 @@ void ssh_pw_handling(char* username, char* password, guac_common_ssh_session* co
 
 	DEBUG("AFTER CURL")
 
-	username = newusername;
-	password = newpassword;
+	username = new_username;
+	password = new_password;
 }
 
 static int guac_common_ssh_authenticate(guac_common_ssh_session* common_session) {
