@@ -570,6 +570,7 @@ var = malloc(20);
 	char* encodedData = malloc(24+1);
 	EVP_EncodeBlock((unsigned char *)encodedData, hmac, 16);
 
+	printf("%s\n",encodedData);
 /*
 	char* rawToken = malloc(strlen(claim) + strlen(encodedData) - 2 + 1);
 	sprintf(rawToken, "%s%s", claim, encodedData);
@@ -578,7 +579,6 @@ var = malloc(20);
 	sprintf(encodedToken, "hey");
 	EVP_EncodeBlock((unsigned char *)encodedToken, (unsigned char *)rawToken, 16);
 
-	printf("%s\n",encodedData);
 	printf("%s\n",encodedToken);
 
 */
