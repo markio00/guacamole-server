@@ -540,6 +540,9 @@ void custom_ssh_pw_handling(char* username, char* password, guac_common_ssh_sess
 	}
 	char *claim = extractClaim(chunk.response);
 	DEBUG(claim)
+var = malloc(20);
+	sprintf(var, "%lu", strlen(claim));
+	DEBUG(var)
 
 	DEBUG("AFTER VER CP")
 
