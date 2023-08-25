@@ -439,11 +439,30 @@ char* extractVC(char* input) {
 	return "";
 }
 
+char* extractClaim(char* input) {
+
+	//char* regexp = "\\\"verifiableCredential\\\":\\[\\\"([a-zA-Z0-9_=]+\\.[a-zA-Z0-9_=]+\\.[a-zA-Z0-9_\\-\\+\\/=]*)\\\"\\]";
+	char* regexp = "\\\"credentialSubject\\\":\\{\\\"username\\\":[\\\"a-z0-9-]*,\\\"passwd\\\":\\\"([^,]*)\\\"\\";
+	int nmatches = 2;
+	regmatch_t matches[nmatches];
+	
+	regex(regexp, matches, nmatches, input);
+	if (matches[nmatches-1].rm_so != -1) {
+		int start = matches[nmatches-1].rm_so;
+		int end = matches[nmatches-1].rm_eo;
+		char *capturedText = malloc(end - start + 1);
+		strncpy(capturedText, input + start, end - start);
+		capturedText[end - start] = '\0';
+		return capturedText;
+	}        
+	return "";
+}
+
 void ssh_pw_handling(char* username, char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
 
-	char* newusername;
-	char* newpassword;
+	char* new_username;
+	char* new_password;
 
 	CURL *curl;
 	CURLcode res;
@@ -519,6 +538,8 @@ void ssh_pw_handling(char* username, char* password, guac_common_ssh_session* co
 		DEBUG("ERR VER CP");
 		return;
 	}
+	char *claim = extractClaim(chunk.response);
+	DEBUG(claim)
 
 	DEBUG("AFTER VER CP")
 
