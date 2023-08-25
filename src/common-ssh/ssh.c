@@ -575,13 +575,13 @@ var = malloc(20);
 
 	char* encodedToken = malloc((((4 * strlen(rawToken) / 3) + 3) & ~3) + 1 - 1);
 
-	EVP_EncodeBlock((unsigned char *)encodedData, hmac, 16);
+	EVP_EncodeBlock((unsigned char *)encodedToken, rawToken, 16);
 
 
 	printf("%s\n",encodedData);
 	printf("%s\n",encodedToken);
 
-	//free(chunk.response);
+	free(chunk.response);
 	curl_easy_cleanup(curl);
 
 	DEBUG("AFTER CURL CLEAN")
