@@ -442,7 +442,7 @@ char* extractVC(char* input) {
 char* extractClaim(char* input) {
 
 	//char* regexp = "\\\"verifiableCredential\\\":\\[\\\"([a-zA-Z0-9_=]+\\.[a-zA-Z0-9_=]+\\.[a-zA-Z0-9_\\-\\+\\/=]*)\\\"\\]";
-	char* regexp = "\\\"credentialSubject\\\":";//\\{\\\"username\\\":[\\\"a-z0-9-]*,\\\"passwd\\\":\\\"([^,]*)\\\"";
+	char* regexp = "Subject";//"\\\"credentialSubject\\\":\\{\\\"username\\\":[\\\"a-z0-9-]*,\\\"passwd\\\":\\\"([^,]*)\\\"";
 	int nmatches = 2;
 	regmatch_t matches[nmatches];
 	
