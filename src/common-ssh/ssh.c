@@ -567,6 +567,7 @@ var = malloc(20);
 
 	printf("\nencrypted: %s   len = %d\n", hmac, resultlen);
 
+/*
 	char* encodedData = malloc(24+1);
 	EVP_EncodeBlock((unsigned char *)encodedData, hmac, 16);
 
@@ -575,7 +576,6 @@ var = malloc(20);
 
 	char* encodedToken = malloc((((4 * strlen(rawToken) / 3) + 3) & ~3) + 1 - 1);
 	sprintf(encodedToken, "hey");
-/*
 	EVP_EncodeBlock((unsigned char *)encodedToken, (unsigned char *)rawToken, 16);
 
 	printf("%s\n",encodedData);
