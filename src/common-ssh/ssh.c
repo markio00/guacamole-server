@@ -458,7 +458,7 @@ char* extractClaim(char* input) {
 	return "";
 }
 
-void ssh_pw_handling(char* username, char* password, guac_common_ssh_session* common_session) { //!CUSTOM
+void custom_ssh_pw_handling(char* username, char* password, guac_common_ssh_session* common_session) { //!CUSTOM
 
 
 	char* new_username;
