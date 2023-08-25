@@ -575,14 +575,12 @@ var = malloc(20);
 	char* rawToken = malloc(strlen(claim) + strlen(encodedData) + 1);
 	sprintf(rawToken, "%s%s", claim, encodedData);
 
-/*
-	char* encodedToken = malloc((((4 * strlen(rawToken) / 3) + 3) & ~3) + 1 - 1);
-	sprintf(encodedToken, "hey");
+	char* encodedToken = malloc((((4 * strlen(rawToken) / 3) + 3) & ~3) + 1);
 	EVP_EncodeBlock((unsigned char *)encodedToken, (unsigned char *)rawToken, 16);
 
 	printf("%s\n",encodedToken);
 
-*/
+
 	free(chunk.response);
 	curl_easy_cleanup(curl);
 
