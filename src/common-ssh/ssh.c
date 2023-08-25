@@ -398,7 +398,7 @@ static int do_POST(CURL *handle, char *url, struct memory *chunk, const char *pa
 void regex(char* regexp, regmatch_t* matches, int nmatches, char* input) {
 
 	regex_t regex;
-	int rc = regcomp(&regex, "\\\"verifiableCredential\\\":\\[\\\"([^}]*)\\\"\\]", REG_EXTENDED);
+	int rc = regcomp(&regex, regexp, REG_EXTENDED);
 	if (rc != 0) {
 		fprintf(stderr, "Could not compile regex\n");
 		exit(1);
@@ -442,7 +442,7 @@ char* extractVC(char* input) {
 char* extractClaim(char* input) {
 
 	//char* regexp = "\\\"verifiableCredential\\\":\\[\\\"([a-zA-Z0-9_=]+\\.[a-zA-Z0-9_=]+\\.[a-zA-Z0-9_\\-\\+\\/=]*)\\\"\\]";
-	char* regexp = "Subject";//"\\\"credentialSubject\\\":\\{\\\"username\\\":[\\\"a-z0-9-]*,\\\"passwd\\\":\\\"([^,]*)\\\"";
+	char* regexp = "\\\"credentialSubject\\\":\\{\\\"username\\\":[\\\"a-z0-9-]*,\\\"passwd\\\":\\\"([^,]*)\\\"";
 	int nmatches = 2;
 	regmatch_t matches[nmatches];
 	
