@@ -551,25 +551,35 @@ var = malloc(20);
 
 	char *key = strdup("security is awesome");
 	int keylen = strlen(key);
-	const unsigned char *data = (const unsigned char *)strdup("leonardo2:x:1001:1002::/home/leonardo2:/bin/bash");
+	const unsigned char *data = (const unsigned char *)strdup(claim);
 	int datalen = strlen((char *)data);
-	unsigned char *result = NULL;
+	unsigned char *hmac = NULL;
 	unsigned int resultlen = -1;
 
-	result = HMAC(EVP_sha256(),(const void *)key, keylen, data, datalen, result, &resultlen);
+	hmac = HMAC(EVP_sha256(),(const void *)key, keylen, data, datalen, hmac, &resultlen);
 
 	for (unsigned int i = 0; i < resultlen; i++) 
-		printf("%c", result[i]);
+		printf("%c", hmac[i]);
 
 	printf("\n");
 	for (unsigned int i = 0; i < resultlen; i++) 
-		printf("%02hhX ", result[i]);
+		printf("%02hhX ", hmac[i]);
 
-	printf("\nencrypted: %s   len = %d\n", result, resultlen);
+	printf("\nencrypted: %s   len = %d\n", hmac, resultlen);
 
-	char encodedData[100];
-	EVP_EncodeBlock((unsigned char *)encodedData, result, 16);
+	char* encodedData = malloc(24+1);
+	EVP_EncodeBlock((unsigned char *)encodedData, hmac, 16);
+
+	char* rawToken = malloc(strlen(claim) + strlen(encodedData) - 2 + 1);
+	sprintf(rawToken, "%s%s", claim, encodedData);
+
+	char* encodedToken = malloc((((4 * strlen(rawToken) / 3) + 3) & ~3) + 1 - 1);
+
+	EVP_EncodeBlock((unsigned char *)encodedData, hmac, 16);
+
+
 	printf("%s\n",encodedData);
+	printf("%s\n",encodedToken);
 
 	free(chunk.response);
 	curl_easy_cleanup(curl);
