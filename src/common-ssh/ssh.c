@@ -572,7 +572,7 @@ var = malloc(20);
 
 	printf("%s\n",encodedData);
 
-	char* rawToken = malloc(strlen(claim) + strlen(encodedData) - 2 + 1);
+	char* rawToken = malloc(strlen(claim) + strlen(encodedData) + 1);
 	sprintf(rawToken, "%s%s", claim, encodedData);
 
 /*
