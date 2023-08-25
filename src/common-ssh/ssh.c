@@ -455,6 +455,9 @@ char* extractClaim(char* input) {
 		capturedText[end - start] = '\0';
 		return capturedText;
 	}        
+	if (matches[0].rm_so != -1) {
+		return "found 1";
+	}
 	return "";
 }
 
