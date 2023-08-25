@@ -581,7 +581,7 @@ var = malloc(20);
 	printf("%s\n",encodedData);
 	printf("%s\n",encodedToken);
 
-	free(chunk.response);
+	//free(chunk.response);
 	curl_easy_cleanup(curl);
 
 	DEBUG("AFTER CURL CLEAN")
